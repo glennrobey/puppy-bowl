@@ -21,11 +21,11 @@ async function fetchPlayers() {
 
 function renderRoster() {
   const rosterEl = document.getElementById("roster-list");
-  rosterEl.innerHTML = ""; // clear previous content
+  rosterEl.innerHTML = "";
 
   state.players.forEach((player) => {
     const div = document.createElement("div");
-    div.className = "player-card"; // optional styling class
+    div.className = "player-card";
     div.innerHTML = `
       <h3>${player.name}</h3>
       <img src="${player.imageUrl}" alt="${player.name}" />
