@@ -10,50 +10,76 @@ const state = {
 
 const app = document.getElementById("app");
 
-const rosterTitle = document.createElement("h1");
-rosterTitle.textContent = "Player Roster";
-app.appendChild(rosterTitle);
+function createRosterSection() {
+  const rosterTitle = document.createElement("h1");
+  rosterTitle.textContent = "Player Roster";
 
-const rosterList = document.createElement("div");
-rosterList.id = "roster-list";
-app.appendChild(rosterList);
+  const rosterList = document.createElement("div");
+  rosterList.id = "roster-list";
 
-const selectedTitle = document.createElement("h2");
-selectedTitle.textContent = "Selected Player";
-app.appendChild(selectedTitle);
+  app.appendChild(rosterTitle);
+  app.appendChild(rosterList);
+}
 
-const selectedPlayerDiv = document.createElement("div");
-selectedPlayerDiv.id = "selected-player";
-selectedPlayerDiv.innerHTML = "<p>Please select a player.</p>";
-app.appendChild(selectedPlayerDiv);
+function createSelectedPlayerSection() {
+  const selectedTitle = document.createElement("h2");
+  selectedTitle.textContent = "Selected Player";
 
-const addTitle = document.createElement("h2");
-addTitle.textContent = "Add Player";
-app.appendChild(addTitle);
+  const selectedPlayerDiv = document.createElement("div");
+  selectedPlayerDiv.id = "selected-player";
+  selectedPlayerDiv.innerHTML = "<p>Please select a player.</p>";
 
-const form = document.createElement("form");
-form.id = "add-player-form";
+  app.appendChild(selectedTitle);
+  app.appendChild(selectedPlayerDiv);
+}
 
-const nameInput = document.createElement("input");
-nameInput.type = "text";
-nameInput.name = "name";
-nameInput.placeholder = "Player Name";
-nameInput.required = true;
+function createAddPlayerForm() {
+  const addTitle = document.createElement("h2");
+  addTitle.textContent = "Add Player";
 
-const breedInput = document.createElement("input");
-breedInput.type = "text";
-breedInput.name = "breed";
-breedInput.placeholder = "Breed";
-breedInput.required = true;
+  const form = document.createElement("form");
+  form.id = "add-player-form";
 
-const submitButton = document.createElement("button");
-submitButton.type = "submit";
-submitButton.textContent = "Add Player";
+  const nameInput = document.createElement("input");
+  nameInput.type = "text";
+  nameInput.name = "name";
+  nameInput.placeholder = "Player Name";
+  nameInput.required = true;
 
-form.appendChild(nameInput);
-form.appendChild(breedInput);
-form.appendChild(submitButton);
-app.appendChild(form);
+  const breedInput = document.createElement("input");
+  breedInput.type = "text";
+  breedInput.name = "breed";
+  breedInput.placeholder = "Breed";
+  breedInput.required = true;
+
+  const submitButton = document.createElement("button");
+  submitButton.type = "submit";
+  submitButton.textContent = "Add Player";
+
+  form.appendChild(nameInput);
+  form.appendChild(breedInput);
+  form.appendChild(submitButton);
+
+  app.appendChild(addTitle);
+  app.appendChild(form);
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const name = e.target.name.value;
+    const breed = e.target.breed.value;
+    try {
+      await fetch(PLAYERS_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, breed }),
+      });
+      e.target.reset();
+      fetchPlayers();
+    } catch (err) {
+      console.error(err);
+    }
+  });
+}
 
 async function fetchPlayers() {
   try {
@@ -66,8 +92,6 @@ async function fetchPlayers() {
   }
 }
 
-fetchPlayers();
-
 function renderRoster() {
   const rosterEl = document.getElementById("roster-list");
   rosterEl.innerHTML = "";
@@ -79,7 +103,6 @@ function renderRoster() {
       <h3>${player.name}</h3>
       <img src="${player.imageUrl}" alt="${player.name}" />
     `;
-
     div.addEventListener("click", () => selectPlayer(player.id));
     rosterEl.appendChild(div);
   });
@@ -106,14 +129,14 @@ function renderSelectedPlayer() {
   }
 
   detailEl.innerHTML = `
-<h2>${player.name}</h2>
-<p>ID: ${player.id}</p>
-<p>Breed: ${player.breed}</p>
-<p>Status: ${player.status}</p>
-<p>Team: ${player.team?.name || "Unassigned"}</p>
-<img src="${player.imageUrl}" alt="${player.name}" />
-<button id="remove-btn">Remove from roster</button>
-`;
+    <h2>${player.name}</h2>
+    <p>ID: ${player.id}</p>
+    <p>Breed: ${player.breed}</p>
+    <p>Status: ${player.status}</p>
+    <p>Team: ${player.team?.name || "Unassigned"}</p>
+    <img src="${player.imageUrl}" alt="${player.name}" />
+    <button id="remove-btn">Remove from roster</button>
+  `;
 
   document.getElementById("remove-btn").addEventListener("click", removePlayer);
 }
@@ -125,7 +148,6 @@ async function removePlayer() {
     await fetch(`${API}/players/${state.selectedPlayer.id}`, {
       method: "DELETE",
     });
-
     state.selectedPlayer = null;
     fetchPlayers();
     renderSelectedPlayer();
@@ -134,22 +156,7 @@ async function removePlayer() {
   }
 }
 
-document
-  .getElementById("add-player-form")
-  .addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    const name = e.target.name.value;
-    const breed = e.target.breed.value;
-    try {
-      await fetch(PLAYERS_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, breed }),
-      });
-      e.target.reset();
-      fetchPlayers();
-    } catch (err) {
-      console.error(err);
-    }
-  });
+createRosterSection();
+createSelectedPlayerSection();
+createAddPlayerForm();
+fetchPlayers();
