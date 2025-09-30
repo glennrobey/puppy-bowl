@@ -1,5 +1,5 @@
 const BASE = "https://fsa-puppy-bowl.herokuapp.com/api";
-const COHORT = "2803-PUPPIES";
+const COHORT = "2803-GLENN";
 const API = `${BASE}/${COHORT}`;
 const PLAYERS_URL = `${API}/players`;
 
@@ -7,6 +7,53 @@ const state = {
   players: [],
   selectedPlayer: null,
 };
+
+const app = document.getElementById("app");
+
+const rosterTitle = document.createElement("h1");
+rosterTitle.textContent = "Player Roster";
+app.appendChild(rosterTitle);
+
+const rosterList = document.createElement("div");
+rosterList.id = "roster-list";
+app.appendChild(rosterList);
+
+const selectedTitle = document.createElement("h2");
+selectedTitle.textContent = "Selected Player";
+app.appendChild(selectedTitle);
+
+const selectedPlayerDiv = document.createElement("div");
+selectedPlayerDiv.id = "selected-player";
+selectedPlayerDiv.innerHTML = "<p>Please select a player.</p>";
+app.appendChild(selectedPlayerDiv);
+
+const addTitle = document.createElement("h2");
+addTitle.textContent = "Add Player";
+app.appendChild(addTitle);
+
+const form = document.createElement("form");
+form.id = "add-player-form";
+
+const nameInput = document.createElement("input");
+nameInput.type = "text";
+nameInput.name = "name";
+nameInput.placeholder = "Player Name";
+nameInput.required = true;
+
+const breedInput = document.createElement("input");
+breedInput.type = "text";
+breedInput.name = "breed";
+breedInput.placeholder = "Breed";
+breedInput.required = true;
+
+const submitButton = document.createElement("button");
+submitButton.type = "submit";
+submitButton.textContent = "Add Player";
+
+form.appendChild(nameInput);
+form.appendChild(breedInput);
+form.appendChild(submitButton);
+app.appendChild(form);
 
 async function fetchPlayers() {
   try {
@@ -18,6 +65,8 @@ async function fetchPlayers() {
     console.error(err);
   }
 }
+
+fetchPlayers();
 
 function renderRoster() {
   const rosterEl = document.getElementById("roster-list");
@@ -61,6 +110,7 @@ function renderSelectedPlayer() {
 <p>ID: ${player.id}</p>
 <p>Breed: ${player.breed}</p>
 <p>Status: ${player.status}</p>
+<p>Team: ${player.team?.name || "Unassigned"}</p>
 <img src="${player.imageUrl}" alt="${player.name}" />
 <button id="remove-btn">Remove from roster</button>
 `;
