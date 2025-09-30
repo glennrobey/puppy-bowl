@@ -46,3 +46,24 @@ async function selectPlayer(id) {
     console.error(err);
   }
 }
+
+function renderSelectedPlayer() {
+  const detailEl = document.getElementById("selected-player");
+  const player = state.selectedPlayer;
+
+  if (!player) {
+    detailEl.innerHTML = "<p>Please select a player for details.</p>";
+    return;
+  }
+
+  detailEl.innerHTML = `
+<h2>${player.name}</h2>
+<p>ID: ${player.id}</p>
+<p>Breed: ${player.breed}</p>
+<p>Status: ${player.status}</p>
+<img src="${player.imageUrl}" alt="${player.name}" />
+<button id="remove-btn">Remove from roster</button>
+`;
+
+  document.getElementById("remove-btn").addEventListener("click", removePlayer);
+}
